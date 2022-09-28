@@ -26,7 +26,7 @@ export class UserService {
   }
 
   findOne(username: string) {
-    return this.users.find((user) => user.username === username);
+    return this.users.find(user => user.username === username);
   }
 
   update(id: number, updateUserInput: UpdateUserInput) {
@@ -35,5 +35,9 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  getUser(id: number) {
+    return this.users.find(user => user.id === id);
   }
 }
