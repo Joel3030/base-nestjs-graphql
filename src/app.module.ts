@@ -6,6 +6,9 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { UserService } from './user/user.service';
+import { AccessControlModule } from 'nest-access-control';
+import { roles } from './common/roles/app.roles';
 
 @Module({
   imports: [
@@ -21,8 +24,13 @@ import { AuthModule } from './auth/auth.module';
       expandVariables: true,
       isGlobal: true,
     }),
+    AccessControlModule.forRoles(roles),
     UserModule,
     AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private userService: UserService) {
+    this.userService;
+  }
+}
