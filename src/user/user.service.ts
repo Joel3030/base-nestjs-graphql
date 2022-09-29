@@ -23,7 +23,7 @@ export class UserService {
     return this.users.find((user) => user.username === username);
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
+  update(id: string, updateUserInput: UpdateUserInput) {
     return `This action updates a #${id} user ${updateUserInput}`;
   }
 
