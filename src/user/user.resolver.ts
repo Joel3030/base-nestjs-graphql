@@ -1,37 +1,35 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { UserService } from './user.service';
-import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { CreateUserInput, UpdateUserInput, UserResponse } from './dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserService } from './user.service';
 
-@Resolver(() => User)
+@Resolver(() => UserResponse)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
     return this.userService.create(createUserInput);
   }
 
-  @Query(() => [User], { name: 'users' })
+  @Query(() => [UserResponse], { name: 'users' })
   @UseGuards(JwtAuthGuard)
   findAll() {
     return this.userService.findAll();
   }
 
-  @Query(() => User, { name: 'user' })
+  @Query(() => UserResponse, { name: 'user' })
   findOne(@Args('username') username: string) {
     return this.userService.findOne(username);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.userService.update(updateUserInput.id, updateUserInput);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   removeUser(@Args('id', { type: () => Int }) id: number) {
     return this.userService.remove(id);
   }

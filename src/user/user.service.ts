@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { PrismaService } from '../common/services/prisma.service';
 
 @Injectable()
 export class UserService {
   private users = [];
 
-  constructor() {
+  constructor(private prisma: PrismaService) {
     this.setDefaultUser();
   }
 
@@ -15,8 +16,8 @@ export class UserService {
     return createUserInput;
   }
 
-  findAll() {
-    return this.users;
+  async findAll() {
+    return await this.prisma.user.findMany();
   }
 
   findOne(username: string) {
@@ -42,9 +43,8 @@ export class UserService {
 
     if (!defaultUser) {
       const newUser = {
-        id: '1',
         username: 'admin',
-        password: '1234',
+        password: '@Admin3030',
         roles: ['ADMIN'],
       };
       newUser.password = await hash(newUser.password, 10);

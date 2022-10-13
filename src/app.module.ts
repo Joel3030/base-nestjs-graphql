@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { AccessControlModule } from 'nest-access-control';
 import { roles } from './common/roles/app.roles';
+import { PrismaService } from './common/services/prisma.service';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { roles } from './common/roles/app.roles';
     UserModule,
     AuthModule,
   ],
+  providers: [PrismaService],
 })
 export class AppModule {
   constructor(private userService: UserService) {

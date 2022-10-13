@@ -18,27 +18,22 @@ input LoginUserInput {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
+  createUser(createUserInput: CreateUserInput!): UserResponse!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   refreshToken: LoginResponse!
-  removeUser(id: Int!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): UserResponse!
+  updateUser(updateUserInput: UpdateUserInput!): UserResponse!
 }
 
 type Query {
-  user(username: String!): User!
-  users: [User!]!
+  user(username: String!): UserResponse!
+  users: [UserResponse!]!
 }
 
 input UpdateUserInput {
   id: String!
   password: String
   username: String
-}
-
-type User {
-  id: Int!
-  username: String!
 }
 
 type UserResponse {
