@@ -1,36 +1,40 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { CreateUserInput, UpdateUserInput, UserResponse } from './dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserService } from './user.service';
+import { User } from 'src/graphql';
+import { Prisma } from '@prisma/client';
 
-@Resolver(() => UserResponse)
+@Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation(() => UserResponse)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+  @Mutation(() => User)
+  createUser(@Args('createUserInput') createUserInput: Prisma.UserCreateInput) {
     return this.userService.create(createUserInput);
   }
 
-  @Query(() => [UserResponse], { name: 'users' })
+  @Query(() => [User], { name: 'users' })
   @UseGuards(JwtAuthGuard)
-  findAll() {
+  getUsers() {
     return this.userService.findAll();
   }
 
-  @Query(() => UserResponse, { name: 'user' })
-  findOne(@Args('username') username: string) {
-    return this.userService.findOne(username);
+  @Query(() => User, { name: 'user' })
+  findOne(@Args('id', { type: () => String }) id: string) {
+    return this.userService.findOne({ id });
   }
 
-  @Mutation(() => UserResponse)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.userService.update(updateUserInput.id, updateUserInput);
+  @Mutation(() => User)
+  updateUser(
+    @Args('id', { type: () => String }) id: string,
+    @Args('updateUserInput') updateUserInput: Prisma.UserUpdateInput,
+  ) {
+    return this.userService.update({ id }, updateUserInput);
   }
 
-  @Mutation(() => UserResponse)
-  removeUser(@Args('id', { type: () => Int }) id: number) {
-    return this.userService.remove(id);
+  @Mutation(() => User)
+  removeUser(@Args('id', { type: () => String }) id: string) {
+    return this.userService.remove({ id });
   }
 }

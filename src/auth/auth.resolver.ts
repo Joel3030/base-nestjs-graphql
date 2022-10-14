@@ -3,22 +3,21 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { UserDecorator } from 'src/auth/decorators/user.decorator';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { AuthService } from './auth.service';
-import { LoginResponse } from './dtos/login-response';
-import { LoginUserInput } from './dtos/login-user.input';
 import { LocalAuthGuard } from './guards';
 import { AppResource } from '../common/roles/app.roles';
+import { Login, LoginUserInput } from 'src/graphql';
 
 @Resolver()
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => Login)
   @UseGuards(LocalAuthGuard)
   login(@Args('loginUserInput') loginUserInput: LoginUserInput) {
     return this.authService.login(loginUserInput);
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => Login)
   @Auth({
     resource: AppResource.USER,
     action: 'create',

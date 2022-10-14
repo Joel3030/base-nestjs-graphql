@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
-import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { AccessControlModule } from 'nest-access-control';
 import { roles } from './common/roles/app.roles';
-import { PrismaService } from './common/services/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { GraphQLDateTime } from 'graphql-iso-date';
 
 @Module({
   imports: [
@@ -17,8 +17,8 @@ import { PrismaService } from './common/services/prisma.service';
       driver: ApolloDriver,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault],
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
+      typePaths: ['./**/*.graphql'],
+      resolvers: { DateTime: GraphQLDateTime },
     }),
     ConfigModule.forRoot({
       cache: true,

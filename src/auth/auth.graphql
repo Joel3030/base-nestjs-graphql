@@ -1,0 +1,15 @@
+scalar DateTime
+
+type Login {
+  access_token: String!
+}
+
+input LoginUserInput {
+  password: String!
+  username: String!
+}
+
+type Mutation {
+  login(loginUserInput: LoginUserInput!): Login!
+  refreshToken: Login!
+}

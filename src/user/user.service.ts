@@ -1,55 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
-import { PrismaService } from '../common/services/prisma.service';
+
+import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  private users = [];
-
   constructor(private prisma: PrismaService) {
     this.setDefaultUser();
   }
 
-  create(createUserInput: CreateUserInput) {
-    return createUserInput;
+  async create(createUserInput: Prisma.UserCreateInput) {
+    const userExist = await this.prisma.user.findFirst({
+      where: {
+        username: createUserInput.username,
+      },
+    });
+    if (userExist) throw new BadRequestException('User already registered');
+
+    createUserInput.password = await hash(createUserInput.password, 10);
+    const user = await this.prisma.user.create({
+      data: createUserInput,
+    });
+
+    return user;
   }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany();
+    return users;
   }
 
-  findOne(username: string) {
-    return this.users.find((user) => user.username === username);
+  async findOne(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
+    const user = await this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+    });
+    return user;
   }
 
-  update(id: string, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user ${updateUserInput}`;
+  async findOneByUsername(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: username,
+      },
+    });
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    updateUserInput: Prisma.UserUpdateInput,
+  ) {
+    const updateUser = await this.prisma.user.update({
+      where: userWhereUniqueInput,
+      data: updateUserInput,
+    });
+    return updateUser;
   }
 
-  getUser(id: number) {
-    return this.users.find((user) => user.id === id);
+  async remove(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
+    const deleteUser = await this.prisma.user.delete({
+      where: userWhereUniqueInput,
+    });
+    return deleteUser;
   }
 
   async setDefaultUser() {
-    const defaultUser = this.users.some(
-      (user: CreateUserInput) => user.username === 'admin',
-    );
+    const defaultUser = await this.prisma.user.findFirst({
+      where: {
+        username: 'admin',
+      },
+    });
 
     if (!defaultUser) {
-      const newUser = {
+      const newUser: Prisma.UserCreateInput = {
         username: 'admin',
         password: '@Admin3030',
         roles: ['ADMIN'],
       };
       newUser.password = await hash(newUser.password, 10);
 
-      this.users = [...this.users, newUser];
+      return await this.prisma.user.create({
+        data: newUser,
+      });
     }
   }
 }
